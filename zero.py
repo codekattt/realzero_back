@@ -10,7 +10,7 @@ import json
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # 모든 도메인에서 오는 요청을 허용
+CORS(app, origins=["http://localhost:3000"])
 
 api_url = 'https://sz8h5pxrg0.apigw.ntruss.com/custom/v1/31692/e0549b16f2ad13b9cb308654cfa5548115dd73f42285837baef730fb80531d36/general'
 secret_key = os.getenv('OCR_SECRET_KEY')
@@ -56,4 +56,4 @@ def ocr():
         return jsonify({'error': response.text}), response.status_code
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=8080)
