@@ -21,23 +21,34 @@ def get_chatgpt_response():
     }
 
     payload = {
-        'model': 'gpt-4',
+        'model': 'gpt-4o',
         'messages': [
             {
                 'role': 'system',
                 'content': (
-                    'Your task is to analyze the additives in a food and evaluate whether it contains sugar, '
-                    'and if not, what substitute sugar is used in its place, and whether this food has no sugar at all. '
-                    'First, tell us what the most commonly used substitute sugar is in this food, and briefly describe the advantages and disadvantages of that additive. '
-                    'If you do not include any nutritional information or additives, we will see a message saying "We are unable to analyze the nutritional content, please resubmit with the correct photo". '
-                    'Answer in Korean'
+                    'You are a food and nutrition analyst'
+                    'Analyze the food additives and nutritional information in the given text.'
+                    'If it does contain sugar, end the conversation.'
+                    'Only if the text additive does not contain sugar, give the ingredient used in place of sugar and the advantages and disadvantages of that ingredient.'
+                    'If text does not include any nutritional information or additives, say "Unable to analyze the nutritional content, please resubmit with the correct photo".'
+                    'As a result, evaluate whether the product is sugar-free or zero-calorie or else.'
+                    'Answer in only Korean.'
                 )
             },
             {
                 'role': 'user',
                 'content': prompt
+            },
+            {
+                'role': 'assistant',
+                'content': ''
             }
-        ]
+        ],
+        'temperature': 0,
+        'max_tokens': 565,
+        'top_p': 1,
+        'frequency_penalty': 0.8,
+        'presence_penalty':0.5
     }
 
     response = requests.post(OPENAI_ENDPOINT, headers=headers, json=payload)

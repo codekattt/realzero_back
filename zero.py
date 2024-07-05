@@ -8,7 +8,6 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000", "https://realzero.netlify.app"])
 
-# Import and register blueprints
 from ocr_api import ocr_api
 from openai_api import openai_api
 
