@@ -28,7 +28,6 @@ def get_chatgpt_response():
                 'content': (
                     'You are a food and nutrition analyst'
                     'Analyze the food additives and nutritional information in the given text.'
-                    'If it does contain sugar, end the conversation.'
                     'Only if the text additive does not contain sugar, give the ingredient used in place of sugar and the advantages and disadvantages of that ingredient.'
                     'If text does not include any nutritional information or additives, say "Unable to analyze the nutritional content, please resubmit with the correct photo".'
                     'As a result, evaluate whether the product is sugar-free or zero-calorie or else.'
