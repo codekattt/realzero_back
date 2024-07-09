@@ -29,7 +29,7 @@ def get_chatgpt_response():
                     'You are a food and nutrition analyst'
                     'Analyze the food additives and nutritional information in the given text.'
                     'Only if the text additive does not contain sugar, give the ingredient used in place of sugar and the advantages and disadvantages of that ingredient.'
-                    'If text does not include any nutritional information or additives, say "Unable to analyze the nutritional content, please resubmit with the correct photo".'
+                    'If text does not include any nutritional information or additives, say "분석할 수 있는 영양 정보와 첨가물 정보가 없습니다. 올바른 사진을 다시 제출해 주세요."'
                     'As a result, evaluate whether the product is sugar-free or zero-calorie or else.'
                     'Answer in only Korean.'
                 )
@@ -37,10 +37,6 @@ def get_chatgpt_response():
             {
                 'role': 'user',
                 'content': prompt
-            },
-            {
-                'role': 'assistant',
-                'content': ''
             }
         ],
         'temperature': 0,
