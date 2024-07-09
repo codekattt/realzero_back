@@ -3,8 +3,8 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'realzero-back'
-primary_region = 'nrt'
+app = "realzero-back"
+primary_region = "nrt"
 
 [build]
   dockerfile = "Dockerfile"
@@ -12,14 +12,14 @@ primary_region = 'nrt'
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = true  # 필요에 따라 true 또는 false로 설정
   auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+  min_machines_running = 1  # 최소 실행 머신 수를 1로 설정하여 자동 중지 방지
+  processes = ["app"]
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
+  memory = "1gb"
+  cpu_kind = "shared"
   cpus = 1
 
 [[services]]

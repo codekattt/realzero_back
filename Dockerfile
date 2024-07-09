@@ -17,4 +17,5 @@ COPY . .
 ENV PORT 8080
 
 # 애플리케이션을 실행한다.
-CMD ["python", "zero.py"]
+# CMD ["python", "zero.py"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "zero:app"]
