@@ -21,7 +21,7 @@ def get_chatgpt_response():
     }
 
     payload = {
-        'model': 'gpt-4o',
+        'model': 'gpt-4o-mini',
         'messages': [
             {
                 'role': 'system',
