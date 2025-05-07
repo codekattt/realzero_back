@@ -1,4 +1,5 @@
 import os
+import base64
 import requests
 from flask import Blueprint, request, jsonify
 from dotenv import load_dotenv
@@ -11,44 +12,52 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions'
 
 @openai_api.route('/openai', methods=['POST'])
-def get_chatgpt_response():
-    data = request.json
-    prompt = data.get('prompt')
+def analyze_image_with_gpt():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No image file provided'}), 400
+
+    file = request.files['file']
+    image_bytes = file.read()
+    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+    image_data_url = f"data:{file.content_type};base64,{image_base64}"
 
     headers = {
-        'Authorization': f'Bearer {OPENAI_API_KEY}',
-        'Content-Type': 'application/json'
+        "Authorization": f"Bearer {OPENAI_API_KEY}",
+        "Content-Type": "application/json"
     }
 
     payload = {
-        'model': 'gpt-4o-mini',
-        'messages': [
+        "model": "gpt-4o",
+        "messages": [
             {
-                'role': 'system',
-                'content': (
-                    'You are a food and nutrition analyst.'
-                    'Analyze the food additives and nutritional information in the given text.'
-                    'Only if the text additive does not contain sugar, give the ingredient used in place of sugar and the advantages and disadvantages of that ingredient.'
-                    'As a result, evaluate whether the product is sugar-free or zero-calorie or else.'
-                    '텍스트에 영양성분 또는 첨가물 정보가 없다면 분석하지 말아줘.'
-                    'Answer in only Korean.'
+                "role": "system",
+                "content": (
+                    "너는 식품 영양 분석가야. 이미지 속 첨가물과 영양 정보를 분석해줘. "
+                    "설탕이 없으면 대체제로 무엇이 들어갔는지, 그 장단점을 말해줘. "
+                    "그리고 이 제품이 무설탕인지, 제로 칼로리인지 판단해줘. "
+                    "텍스트 정보가 없으면 분석하지 마. 무조건 한국어로 답해줘."
                 )
             },
             {
-                'role': 'user',
-                'content': prompt
+                "role": "user",
+                "content": [
+                    { "type": "text", "text": "이 제품을 분석해줘." },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_data_url
+                        }
+                    }
+                ]
             }
         ],
-        'temperature': 0,
-        'max_tokens': 565,
-        'top_p': 1,
-        'frequency_penalty': 0.8,
-        'presence_penalty':0.5
+        "temperature": 0.2,
+        "max_tokens": 800
     }
 
     response = requests.post(OPENAI_ENDPOINT, headers=headers, json=payload)
-    
+
     if response.status_code == 200:
         return jsonify(response.json())
     else:
-        return jsonify({'error': 'Error processing request'}), response.status_code
+        return jsonify({'error': response.text}), response.status_code
