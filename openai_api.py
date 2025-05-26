@@ -13,9 +13,10 @@ OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions'
 
 @openai_api.route('/openai', methods=['POST'])
 def analyze_image_with_gpt():
-    data = request.get_json()
-
-    if 'image_url' not in data:
+    data = request.get_json(silent=True)
+    
+    if not data or 'image_url' not in data:
+        print("❌ image_url 누락 또는 잘못된 요청:", data)
         return jsonify({'error': 'No image URL provided'}), 400
 
     image_url = data['image_url']
@@ -26,7 +27,7 @@ def analyze_image_with_gpt():
     }
 
     payload = {
-        "model": "o4-mini",
+        "model": "o4-mini-2025-04-16",
         "messages": [
             {
                 "role": "system",
@@ -73,6 +74,6 @@ def analyze_image_with_gpt():
                 end = time.time()
                 print(f"응답 완료 (총 {end - start:.2f}초)")
         except requests.exceptions.RequestException as e:
-            yield jsonify({'error': str(e)})
+            yield f'data: {{"error": "{str(e)}"}}\n'
 
     return Response(stream_openai_response(), content_type='text/event-stream')
