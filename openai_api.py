@@ -27,7 +27,7 @@ def analyze_image_with_gpt():
     }
 
     payload = {
-        "model": "o4-mini-2025-04-16",
+        "model": "o4-mini",
         "messages": [
             {
                 "role": "system",
