@@ -1,8 +1,8 @@
 import os
-import base64
 import requests
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, Response, jsonify
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 
@@ -13,13 +13,12 @@ OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions'
 
 @openai_api.route('/openai', methods=['POST'])
 def analyze_image_with_gpt():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No image file provided'}), 400
+    data = request.get_json()
 
-    file = request.files['file']
-    image_bytes = file.read()
-    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-    image_data_url = f"data:{file.content_type};base64,{image_base64}"
+    if 'image_url' not in data:
+        return jsonify({'error': 'No image URL provided'}), 400
+
+    image_url = data['image_url']
 
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
@@ -44,20 +43,29 @@ def analyze_image_with_gpt():
                     { "type": "text", "text": "이 제품을 분석해줘." },
                     {
                         "type": "image_url",
-                        "image_url": {
-                            "url": image_data_url
-                        }
+                        "image_url": { "url": image_url }
                     }
                 ]
             }
         ],
         "temperature": 0.2,
-        "max_tokens": 800
+        "max_tokens": 800,
+        "stream": True
     }
 
-    response = requests.post(OPENAI_ENDPOINT, headers=headers, json=payload)
+    def stream_openai_response():
+        try:
+            start = time.time()
+            with requests.post(OPENAI_ENDPOINT, headers=headers, json=payload, stream=True, timeout=60) as response:
+                for line in response.iter_lines(decode_unicode=True):
+                    if line and line.startswith('data: '):
+                        chunk = line.replace('data: ', '')
+                        if chunk.strip() == '[DONE]':
+                            break
+                        yield f"{chunk}\n"
+                end = time.time()
+                print(f"응답 완료 (총 {end - start:.2f}초)")
+        except requests.exceptions.RequestException as e:
+            yield jsonify({'error': str(e)})
 
-    if response.status_code == 200:
-        return jsonify(response.json())
-    else:
-        return jsonify({'error': response.text}), response.status_code
+    return Response(stream_openai_response(), content_type='text/event-stream')
