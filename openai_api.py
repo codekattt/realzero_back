@@ -27,7 +27,7 @@ def analyze_image_with_gpt():
     }
 
     payload = {
-        "model": "o4-mini",
+        "model": "gpt-4o-mini-vision",
         "messages": [
             {
                 "role": "system",
@@ -70,7 +70,7 @@ def analyze_image_with_gpt():
                         chunk = line.replace('data: ', '')
                         if chunk.strip() == '[DONE]':
                             break
-                        yield f"{chunk}\n"
+                        yield f"data: {chunk}\n\n"
                 end = time.time()
                 print(f"응답 완료 (총 {end - start:.2f}초)")
         except requests.exceptions.RequestException as e:
