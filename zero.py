@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -7,6 +7,10 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000", "https://realzero.netlify.app"])
+
+@app.route('/api/ping', methods=['GET'])
+def ping():
+    return jsonify({"message": "pong"}), 200
 
 from openai_api import openai_api
 
